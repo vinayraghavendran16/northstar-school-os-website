@@ -1,7 +1,4 @@
 'use strict';
-// Set to your verified, secure same-origin API endpoint before publishing live.
-// Leave empty to keep the enquiry form in preview mode (no transmission).
-const CONTACT_ENDPOINT = '';
 const icons = {
  users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
  calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/>',
@@ -42,5 +39,3 @@ function setRole(name){const r=roles[name];if(!r)return;document.querySelectorAl
 document.querySelectorAll('[data-role]').forEach(b=>b.addEventListener('click',()=>setRole(b.dataset.role)));
 document.querySelectorAll('.faq-question').forEach(b=>{b.addEventListener('click',()=>{const item=b.closest('.faq-item');const active=!item.classList.contains('open');item.classList.toggle('open',active);b.setAttribute('aria-expanded',String(active));});});
 const year=document.querySelector('#year');if(year)year.textContent=new Date().getFullYear();
-const enquiryForm=document.querySelector('#enquiry-form');
-if(enquiryForm){enquiryForm.addEventListener('submit',async e=>{e.preventDefault();if(!enquiryForm.reportValidity())return;const values=Object.fromEntries(new FormData(enquiryForm).entries());const msg=document.querySelector('#form-message');const submit=enquiryForm.querySelector('button[type=submit]');const plain='Northstar School OS walkthrough request\n\n'+Object.entries(values).map(([k,v])=>`${k}: ${String(v).trim()||'(not provided)'}`).join('\n');if(CONTACT_ENDPOINT){try{submit.disabled=true;const res=await fetch(CONTACT_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(values)});if(!res.ok)throw new Error(`Request failed: ${res.status}`);msg.textContent='Your request has been submitted. Thank you for getting in touch.';msg.classList.add('visible');enquiryForm.reset();}catch(err){msg.textContent='We could not submit your request. Please retry, or copy your details and send them through your preferred channel.';msg.classList.add('visible');}finally{submit.disabled=false;}return;}try{await navigator.clipboard.writeText(plain);msg.innerHTML='Preview mode: your enquiry has been copied to the clipboard. <strong>Nothing has been sent.</strong> Once a secure contact destination is configured, this form can be used for direct enquiries.';}catch(err){const area=document.createElement('textarea');area.value=plain;area.readOnly=true;area.style.width='100%';area.style.height='170px';msg.replaceChildren(document.createTextNode('Preview mode: copy the prepared enquiry below. Nothing has been sent.'),area);setTimeout(()=>area.select(),0);}msg.classList.add('visible');});}
